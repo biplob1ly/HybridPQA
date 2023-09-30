@@ -11,7 +11,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.serialization import default_restore_location
 from torch.optim.lr_scheduler import LambdaLR
 from torch.optim import Adam, AdamW
-from retriever.models.biencoder import BiEncoder, HybridEncoder
+from retriever.models.biencoder import BiEncoder
 from retriever.models.hf_models import HFBertEncoder, HFBertEncoderForMLM
 from transformers import BertTokenizer, AutoConfig, AutoModelForSequenceClassification, AutoTokenizer
 

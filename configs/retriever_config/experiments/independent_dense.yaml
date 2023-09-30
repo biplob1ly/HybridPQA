@@ -1,6 +1,6 @@
 EXP: 'independent_dense'
 DISTRIBUTED: False
-DPR:
+RETRIEVER:
   DO_TRAIN: True
   DO_TEST: True
   DATA:

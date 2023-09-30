@@ -1,6 +1,6 @@
 EXP: 'sparse_lexical'
 DISTRIBUTED: False
-DPR:
+RETRIEVER:
   DO_TRAIN: True
   DO_TEST: True
   DATA:

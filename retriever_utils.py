@@ -6,9 +6,6 @@ import logging
 import argparse
 import pandas as pd
 from ranx import Qrels, Run, evaluate, compare
-from calflops import calculate_flops
-from retriever_trainer import RetrieverTrainer
-from retriever.utils.model_utils import get_model_file, get_model_components
 
 logger = logging.getLogger()
 
@@ -145,66 +142,3 @@ def get_weighted_ranked_ctxs(scores, ctx_ids, ctx_srcs, alpha=0.5):
         if scores['dense']:
             final_scores['dense'].append(scores['dense'][i])
     return final_scores, sorted_ctx_ids, sorted_ctx_srcs
-
-
-def visualize(cfg):
-    data = [
-        {
-            "qid": "2108",
-            "question": "how long does a typical game take?",
-            "positive_ctxs": [
-                {
-                    "cid": "19511",
-                    "source": "review",
-                    "text": "5-6 hours is probably a fairly accurate estimate of how long an actual game will take."
-                }
-            ],
-            "negative_ctxs": []
-        }
-    ]
-    model_file = get_model_file(cfg)
-    retriever_trainer = RetrieverTrainer(cfg, model_file=model_file)
-    retriever_trainer.visualize_sparse(data)
-
-
-def compute_FLOPs(cfg):
-    tokenizer, model = get_model_components(cfg)
-    question = ["how many aaa batteries does this require?"]
-    context = ["It requires 3 aaa batteries."]
-
-    if cfg.RETRIEVER.MODEL.BIENCODER_TYPE == 'cross':
-        max_seq_length = cfg.RETRIEVER.MODEL.QUESTION_MAX_LENGTH + cfg.RETRIEVER.MODEL.CONTEXT_MAX_LENGTH
-        inputs = tokenizer(
-            question,
-            context,
-            max_length=max_seq_length,
-            padding='max_length',
-            truncation=True,
-            return_tensors='pt'
-        )
-        flops, macs, params = calculate_flops(
-            model=model,
-            kwargs=inputs,
-            print_results=False
-        )
-    else:
-        max_seq_length = cfg.RETRIEVER.MODEL.QUESTION_MAX_LENGTH
-        inputs = tokenizer(
-            question,
-            max_length=max_seq_length,
-            padding='max_length',
-            truncation=True,
-            return_tensors='pt'
-        )
-        flops, macs, params = calculate_flops(
-            model=model.question_model,
-            kwargs=inputs,
-            print_results=False
-        )
-    # bert-base-uncased - cross encoder FLOPs : 45.94 GFLOPS, MACs: 22.95 GMACs, Params: 109.48 M
-    # bert-base-uncased - hybrid FLOPs: 28.51 GFLOPS, MACs: 14.25 GMACs, Params: 109.51 M
-    # bert-base-uncased - sparse lexical FLOPs: 28.51 GFLOPS, MACs: 14.25 GMACs, Params: 109.51 M
-    # bert-base-uncased - independent dense FLOPs : 22.36 GFLOPS, MACs: 11.17 GMACs, Params: 109.48 M
-    # bert-base-uncased - dense colbert FLOPs : 22.39 GFLOPS, MACs: 11.19 GMACs, Params: 109.58 M
-    # bert-base-uncased - dense colber w/o projection FLOPs: 22.36 GFLOPS, MACs: 11.17 GMACs, Params: 109.48 M
-    print(f"{cfg.RETRIEVER.MODEL.PRETRAINED_MODEL_TYPE} - {cfg.RETRIEVER.MODEL.BIENCODER_TYPE} FLOPs: {flops}, MACs: {macs}, Params: {params}")
