@@ -173,4 +173,3 @@ dependencies:
       - yacs==0.1.8
       - yarl==1.9.2
       - zlib-state==0.1.5
-prefix: /users/PAS1603/biplob/anaconda3/envs/nlp
