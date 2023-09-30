@@ -18,7 +18,7 @@ python-dotenv yacs docopt flatten-json ranx transformers calflops nltk
 
 Check ./requirements/
 
-# TransICD
+# HybridPQA
 
 1. Run Experiments.
 ```
